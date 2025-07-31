@@ -15,6 +15,13 @@
     --rojo: #ff3b30;
 }
 
+/* Bloquear scroll horizontal */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
+}
+
 body {
     font-family: var(--font-family);
     background-color: var(--color-fondo);
@@ -24,6 +31,9 @@ body {
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Prevenir scroll horizontal en móviles */
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
 }
 
 .container {
@@ -34,6 +44,9 @@ body {
     border-radius: var(--radio-borde);
     box-shadow: var(--sombra);
     margin: 0 auto;
+    /* Asegurar que no haya overflow horizontal */
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 header h1 {
@@ -362,27 +375,64 @@ header h1 {
 /* --- RESPONSIVE DESIGN --- */
 @media (max-width: 768px) {
     body {
-        padding: 0;
+        /* Espacio en los bordes para mejorar la usabilidad en móvil */
+        padding: 16px; 
+        overflow-x: hidden;
     }
 
     .container {
+        /* Un padding ligeramente menor para pantallas pequeñas */
         padding: 16px;
-        border-radius: 0;
-        box-shadow: none;
     }
 
     .tarjeta-ciudad {
         grid-template-columns: 1fr auto;
         gap: 12px;
         padding: 16px;
+        /* Asegurar que las tarjetas no causen overflow */
+        width: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
     }
     
     .info-hora {
         text-align: right;
+        /* Prevenir que el contenido de la hora cause overflow */
+        min-width: 0;
+        flex-shrink: 0;
     }
 
     .hora-display {
         font-size: 28px;
+        /* Asegurar que el texto de la hora no cause overflow */
+        word-break: keep-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    /* Prevenir overflow en elementos de texto */
+    .info-ciudad h2,
+    .info-ciudad p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* Asegurar que el slider no cause overflow */
+    .slider-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Prevenir overflow en el buscador */
+    .buscador-container {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    #buscador-ciudad {
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 

@@ -1,5 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Prevenir scroll horizontal en dispositivos móviles
+    function prevenirScrollHorizontal() {
+        // Prevenir scroll horizontal con eventos de touch
+        let startX = 0;
+        let startY = 0;
+        
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+        
+        document.addEventListener('touchmove', function(e) {
+            if (!startX || !startY) return;
+            
+            const deltaX = Math.abs(e.touches[0].clientX - startX);
+            const deltaY = Math.abs(e.touches[0].clientY - startY);
+            
+            // Si el movimiento horizontal es mayor que el vertical, prevenir el scroll
+            if (deltaX > deltaY) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevenir scroll horizontal con la rueda del mouse
+        document.addEventListener('wheel', function(e) {
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Prevenir scroll horizontal con teclas de dirección
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                e.preventDefault();
+            }
+        });
+    }
+    
+    // Inicializar prevención de scroll horizontal
+    prevenirScrollHorizontal();
+
     const buscadorInput = document.getElementById('buscador-ciudad');
     const sugerenciasDiv = document.getElementById('sugerencias');
     const listaCiudadesDiv = document.getElementById('lista-ciudades');
