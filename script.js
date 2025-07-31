@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. REFERENCIAS A ELEMENTOS DEL DOM ---
     const buscadorInput = document.getElementById('buscador-ciudad');
     const sugerenciasDiv = document.getElementById('sugerencias');
     const listaCiudadesDiv = document.getElementById('lista-ciudades');
@@ -8,12 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const infoTiempoDiv = document.getElementById('info-tiempo');
     const resetTimeBtn = document.getElementById('reset-time-btn');
 
-    // --- 2. ESTADO DE LA APLICACIÓN ---
     let todasLasCiudades = [];
     let ciudadesSeleccionadas = [];
     let desfaseMinutos = 0;
-
-    // --- 3. FUNCIONES ---
 
     async function inicializar() {
         try {
@@ -130,9 +126,20 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarTodo();
     }
     
-    function eliminarCiudad(timezone) {
-        ciudadesSeleccionadas = ciudadesSeleccionadas.filter(c => c.timezone !== timezone);
-        renderizarTodo();
+    function eliminarCiudad(timezone, elementoTarjeta) {
+        // Escuchar a que la animación termine, y SÓLO ENTONCES eliminar el elemento.
+        elementoTarjeta.addEventListener('animationend', () => {
+            ciudadesSeleccionadas = ciudadesSeleccionadas.filter(c => c.timezone !== timezone);
+            localStorage.setItem('ciudadesSeleccionadas', JSON.stringify(ciudadesSeleccionadas));
+            elementoTarjeta.remove();
+
+            if (ciudadesSeleccionadas.length === 0) {
+                renderizarTodo();
+            }
+        }, { once: true }); // { once: true } asegura que esto solo se ejecute una vez.
+
+        // Iniciar la animación
+        elementoTarjeta.classList.add('eliminando');
     }
     
     function getEstadoCompatibilidad(hora) {
@@ -152,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const tiempoBase = new Date(new Date().getTime() + desfaseMinutos * 60 * 1000);
         const opcionesFecha = { weekday: 'long', month: 'long', day: 'numeric' };
-        infoTiempoDiv.textContent = `Horas para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
+        infoTiempoDiv.textContent = `Mostrando horario para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
 
         ciudadesSeleccionadas.forEach(ciudad => {
             const formateador = new Intl.DateTimeFormat('es-ES', { timeZone: ciudad.timezone, hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short', weekday: 'short', hour12: false });
@@ -185,7 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             tarjeta.querySelector('.btn-eliminar-ciudad').addEventListener('click', (e) => {
                 e.stopPropagation();
-                eliminarCiudad(ciudad.timezone);
+                eliminarCiudad(ciudad.timezone, tarjeta);
             });
 
             listaCiudadesDiv.appendChild(tarjeta);
@@ -195,11 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetearSlider() {
         const ahora = new Date();
         const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
-        const minutosRedondeados = Math.round(minutosActuales / 15) * 15;
-        timeSlider.value = minutosRedondeados;
+        timeSlider.value = minutosActuales;
         desfaseMinutos = 0;
         
-        const porcentaje = (minutosRedondeados / 1439) * 100;
+        const porcentaje = (minutosActuales / 1439) * 100;
         timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) ${porcentaje}%, var(--color-borde) ${porcentaje}%)`;
     }
 
@@ -218,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tiempoBase = new Date(new Date().getTime() + desfaseMinutos * 60 * 1000);
         
         const opcionesFecha = { weekday: 'long', month: 'long', day: 'numeric' };
-        infoTiempoDiv.textContent = `Horas para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
+        infoTiempoDiv.textContent = `Mostrando horario para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
         
         const tarjetas = document.querySelectorAll('.tarjeta-ciudad');
         tarjetas.forEach(tarjeta => {
@@ -247,6 +253,5 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 4. EJECUCIÓN INICIAL ---
     inicializar();
 });
