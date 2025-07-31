@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags -->
+    <title>Reloj Mundial - Conversor de Zonas Horarias</title>
+    <meta name="description" content="Conversor de zonas horarias en tiempo real. Compara horarios entre ciudades del mundo de forma fácil y rápida.">
+    <meta name="keywords" content="zona horaria, reloj mundial, conversor horario, horarios, ciudades, tiempo">
+    <meta name="author" content="Reloj Mundial">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://reloj-mundial.vercel.app/">
+    <meta property="og:title" content="Reloj Mundial - Conversor de Zonas Horarias">
+    <meta property="og:description" content="Conversor de zonas horarias en tiempo real. Compara horarios entre ciudades del mundo.">
+    <meta property="og:image" content="https://reloj-mundial.vercel.app/og-image.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://reloj-mundial.vercel.app/">
+    <meta property="twitter:title" content="Reloj Mundial - Conversor de Zonas Horarias">
+    <meta property="twitter:description" content="Conversor de zonas horarias en tiempo real. Compara horarios entre ciudades del mundo.">
+    <meta property="twitter:image" content="https://reloj-mundial.vercel.app/og-image.png">
+    
+    <!-- Security -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🕐</text></svg>">
+    
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Reloj Mundial</h1>
+        </header>
+
+        <section class="controles">
+            <div class="buscador-container">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z" clip-rule="evenodd" />
+                </svg>
+                <input type="text" id="buscador-ciudad" placeholder="Busca una ciudad...">
+                <div id="sugerencias" class="sugerencias-container"></div>
+            </div>
+        </section>
+
+        <section id="lista-ciudades">
+        </section>
+
+        <section id="control-tiempo">
+            <div class="slider-wrapper">
+                <button id="reset-time-btn" title="Volver a la hora actual">Ahora</button>
+                <input type="range" min="0" max="1439" step="15" class="slider" id="time-slider">
+            </div>
+            <div id="info-tiempo" class="info-tiempo-actual">
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>Hecho con ❤️ por Nicolás Jofré</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

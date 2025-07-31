@@ -1,0 +1,385 @@
+/* --- VARIABLES Y ESTILOS GENERALES --- */
+:root {
+    --font-family: 'Inter', sans-serif;
+    --color-primario: #007aff;
+    --color-fondo: #f6f6f7;
+    --color-superficie: #ffffff;
+    --color-texto-principal: #1d1d1f;
+    --color-texto-secundario: #6e6e73;
+    --color-borde: #dcdcdc;
+    --sombra: 0px 4px 15px rgba(0, 0, 0, 0.05);
+    --radio-borde: 12px;
+    --transicion: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    --verde: #34c759;
+    --amarillo: #ffcc00;
+    --rojo: #ff3b30;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--color-fondo);
+    color: var(--color-texto-principal);
+    margin: 0;
+    padding: 24px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+    width: 100%;
+    max-width: 720px;
+    background-color: var(--color-superficie);
+    padding: 24px;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    margin: 0 auto;
+}
+
+header h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 32px;
+    background: linear-gradient(135deg, var(--color-primario), #5856d6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- CONTROLES SUPERIORES (BÚSQUEDA) --- */
+.controles {
+    margin-bottom: 24px;
+}
+
+.buscador-container {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    color: var(--color-texto-secundario);
+    transition: var(--transicion);
+}
+
+#buscador-ciudad {
+    width: 100%;
+    padding: 14px 14px 14px 48px;
+    font-size: 16px;
+    border: none;
+    border-radius: var(--radio-borde);
+    box-sizing: border-box;
+    background-color: var(--color-fondo);
+    transition: var(--transicion);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+#buscador-ciudad:focus {
+    outline: none;
+    background-color: var(--color-superficie);
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+#buscador-ciudad:focus + .search-icon {
+    color: var(--color-primario);
+}
+
+.sugerencias-container {
+    position: absolute;
+    width: 100%;
+    background-color: var(--color-superficie);
+    border: none;
+    border-radius: var(--radio-borde);
+    box-shadow: var(--sombra);
+    z-index: 10;
+    margin-top: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+.sugerencia {
+    padding: 14px 16px;
+    cursor: pointer;
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+    transition: var(--transicion);
+    position: relative;
+    overflow: hidden;
+}
+
+.sugerencia::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primario), transparent);
+    transition: var(--transicion);
+    opacity: 0.1;
+}
+
+.sugerencia:hover::before {
+    width: 4px;
+}
+.sugerencia:last-child { border-bottom: none; }
+.sugerencia:hover { background-color: var(--color-fondo); }
+.sugerencia small { color: var(--color-texto-secundario); font-weight: 400; }
+
+/* --- LISTA DE CIUDADES --- */
+#lista-ciudades {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.tarjeta-ciudad {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid transparent;
+    border-radius: var(--radio-borde);
+    background-color: var(--color-fondo);
+    transition: var(--transicion);
+    animation: slideIn 0.4s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tarjeta-ciudad::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--color-primario), transparent);
+    opacity: 0;
+    transition: var(--transicion);
+}
+
+.tarjeta-ciudad:hover::before {
+    opacity: 1;
+}
+.tarjeta-ciudad:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sombra);
+    border-color: var(--color-borde);
+}
+
+.info-ciudad h2 {
+    margin: 0 0 6px 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-texto-principal);
+}
+.info-ciudad p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-texto-secundario);
+    font-weight: 500;
+}
+
+.info-hora {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: right;
+}
+
+.fecha-display {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-texto-secundario);
+}
+.hora-display {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--color-texto-principal);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.punto-compatibilidad {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: var(--transicion);
+    position: relative;
+}
+
+.punto-compatibilidad::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    background: inherit;
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+}
+.verde { background-color: var(--verde); box-shadow: 0 0 8px var(--verde); }
+.amarillo { background-color: var(--amarillo); box-shadow: 0 0 8px var(--amarillo); }
+.rojo { background-color: var(--rojo); box-shadow: 0 0 8px var(--rojo); }
+
+.btn-eliminar-ciudad {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-texto-secundario);
+    cursor: pointer;
+    transition: var(--transicion);
+    opacity: 0; /* Oculto por defecto */
+}
+.tarjeta-ciudad:hover .btn-eliminar-ciudad {
+    opacity: 1; /* Visible en hover */
+}
+.btn-eliminar-ciudad:hover {
+    background-color: var(--rojo);
+    color: white;
+}
+
+/* --- CONTROL DE TIEMPO (SLIDER) --- */
+#control-tiempo {
+    border-top: 1px solid var(--color-borde);
+    padding-top: 16px;
+}
+.info-tiempo-actual {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-texto-secundario);
+    margin-top: 12px;
+}
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+#reset-time-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid var(--color-borde);
+    border-radius: var(--radio-borde);
+    background-color: var(--color-superficie);
+    color: var(--color-texto-principal);
+    cursor: pointer;
+    transition: var(--transicion);
+    white-space: nowrap;
+}
+
+#reset-time-btn:hover { 
+    background-color: #f0f0f0;
+    border-color: var(--color-primario);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos personalizados para el slider */
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, var(--color-primario) 0%, var(--color-borde) 0%);
+    border-radius: 4px;
+    outline: none;
+    transition: var(--transicion);
+    cursor: pointer;
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--color-primario);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--color-superficie);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--color-primario);
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--color-superficie);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+    }
+
+    .container {
+        padding: 16px;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .tarjeta-ciudad {
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 16px;
+    }
+    
+    .info-hora {
+        text-align: right;
+    }
+
+    .hora-display {
+        font-size: 28px;
+    }
+}
+
+/* --- FOOTER --- */
+.footer {
+    text-align: center;
+    padding: 16px;
+    margin-top: 40px;
+    color: var(--color-texto-secundario);
+    font-size: 14px;
+}
