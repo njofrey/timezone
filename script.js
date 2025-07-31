@@ -15,9 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 3. FUNCIONES ---
 
-    /**
-     * Carga el JSON inicial y configura la aplicación
-     */
     async function inicializar() {
         try {
             const response = await fetch('ciudades_mundo.json');
@@ -26,22 +23,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             todasLasCiudades = await response.json();
             
-            // Cargar ciudades guardadas en localStorage, si existen, de forma segura
             let ciudadesGuardadas = null;
             try {
-                ciudadesGuardadas = JSON.parse(localStorage.getItem('ciudadesSeleccionadas'));
-                if (!Array.isArray(ciudadesGuardadas)) {
-                    ciudadesGuardadas = null; // Si no es un array, es inválido
+                const guardado = localStorage.getItem('ciudadesSeleccionadas');
+                if (guardado) {
+                    ciudadesGuardadas = JSON.parse(guardado);
+                    if (!Array.isArray(ciudadesGuardadas)) ciudadesGuardadas = null;
                 }
             } catch (e) {
-                console.warn("No se pudo parsear las ciudades guardadas, se usarán las de por defecto.");
-                ciudadesGuardadas = null;
+                console.warn("No se pudieron cargar las ciudades guardadas.");
             }
 
             if (ciudadesGuardadas && ciudadesGuardadas.length > 0) {
-                ciudadesSeleccionadas = ciudadesGuardadas;
-            } else {
-                // Añadir un par de ciudades por defecto si no hay nada guardado
+                ciudadesSeleccionadas = ciudadesGuardadas
+                    .map(g => todasLasCiudades.find(c => c.timezone === g.timezone))
+                    .filter(Boolean); // Filtra nulos si una ciudad ya no existe
+            }
+            
+            if (ciudadesSeleccionadas.length === 0) {
                 ciudadesSeleccionadas.push(todasLasCiudades.find(c => c.timezone === 'America/Santiago'));
                 ciudadesSeleccionadas.push(todasLasCiudades.find(c => c.timezone === 'Europe/Madrid'));
             }
@@ -65,24 +64,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-
-        
         timeSlider.addEventListener('input', () => {
-            // Forzar que el valor sea múltiplo de 15
             const valorActual = parseInt(timeSlider.value, 10);
             const valorRedondeado = Math.round(valorActual / 15) * 15;
-            
             timeSlider.value = valorRedondeado;
             
             const ahora = new Date();
             const minutosActuales = ahora.getHours() * 60 + ahora.getMinutes();
             desfaseMinutos = valorRedondeado - minutosActuales;
             
-            // Actualizar el gradiente del slider
             const porcentaje = (valorRedondeado / 1439) * 100;
-            timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) 0% ${porcentaje}%, var(--color-borde) ${porcentaje}% 100%)`;
+            timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) ${porcentaje}%, var(--color-borde) ${porcentaje}%)`;
             
-            // Solo actualizar las horas sin re-renderizar todo
             actualizarHoras();
         });
 
@@ -95,18 +88,23 @@ document.addEventListener('DOMContentLoaded', () => {
     function mostrarSugerencias() {
         const texto = buscadorInput.value.toLowerCase().trim();
         sugerenciasDiv.innerHTML = '';
-        if (!texto) {
-            sugerenciasDiv.style.display = 'none';
-            return;
+        
+        let sugerencias;
+        let titulo = '';
+
+        if (texto === '') {
+            titulo = '<div class="sugerencia-titulo">Ciudades Populares</div>';
+            sugerencias = todasLasCiudades.slice(0, 15);
+        } else {
+            sugerencias = todasLasCiudades.filter(ciudad => {
+                const textoBusqueda = texto.toLowerCase();
+                return ciudad.ciudad.toLowerCase().includes(textoBusqueda) || 
+                       ciudad.ciudad_en.toLowerCase().includes(textoBusqueda) ||
+                       (ciudad.pais && ciudad.pais.toLowerCase().includes(textoBusqueda));
+            });
         }
 
-        const sugerencias = todasLasCiudades.filter(ciudad => {
-            const textoBusqueda = texto.toLowerCase();
-            return ciudad.ciudad.toLowerCase().includes(textoBusqueda) || 
-                   ciudad.ciudad_en.toLowerCase().includes(textoBusqueda) ||
-                   (ciudad.pais && ciudad.pais.toLowerCase().includes(textoBusqueda));
-        });
-
+        sugerenciasDiv.innerHTML = titulo;
         if (sugerencias.length > 0) {
             sugerencias.forEach(ciudad => {
                 const div = document.createElement('div');
@@ -115,19 +113,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.addEventListener('click', () => agregarCiudad(ciudad.timezone));
                 sugerenciasDiv.appendChild(div);
             });
-            sugerenciasDiv.style.display = 'block';
-        } else {
-            sugerenciasDiv.style.display = 'none';
+        } else if (texto !== '') {
+            sugerenciasDiv.innerHTML += '<div class="sugerencia-none">No se encontraron resultados</div>';
         }
+
+        sugerenciasDiv.style.display = 'block';
     }
     
     function agregarCiudad(timezone) {
-        const yaExiste = ciudadesSeleccionadas.some(c => c.timezone === timezone);
-        if (!yaExiste) {
+        if (!ciudadesSeleccionadas.some(c => c.timezone === timezone)) {
             const ciudadAAgregar = todasLasCiudades.find(c => c.timezone === timezone);
-            if (ciudadAAgregar) {
-                ciudadesSeleccionadas.push(ciudadAAgregar);
-            }
+            if (ciudadAAgregar) ciudadesSeleccionadas.push(ciudadAAgregar);
         }
         buscadorInput.value = '';
         sugerenciasDiv.style.display = 'none';
@@ -147,11 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderizarTodo() {
         localStorage.setItem('ciudadesSeleccionadas', JSON.stringify(ciudadesSeleccionadas));
-
         listaCiudadesDiv.innerHTML = '';
 
+        if (ciudadesSeleccionadas.length === 0) {
+            listaCiudadesDiv.innerHTML = '<p style="text-align:center; color: #5f6368;">Añade una ciudad para empezar.</p>';
+            return;
+        }
+
         const tiempoBase = new Date(new Date().getTime() + desfaseMinutos * 60 * 1000);
-        
         const opcionesFecha = { weekday: 'long', month: 'long', day: 'numeric' };
         infoTiempoDiv.textContent = `Horas para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
 
@@ -163,7 +162,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const horaLocal = parseInt(data.hour, 10);
             const estado = getEstadoCompatibilidad(horaLocal);
             
-            // Obtener el desfase UTC (ej: "UTC-4")
             const utcOffset = new Intl.DateTimeFormat('en-US', {
                 timeZone: ciudad.timezone,
                 timeZoneName: 'shortOffset',
@@ -201,9 +199,8 @@ document.addEventListener('DOMContentLoaded', () => {
         timeSlider.value = minutosRedondeados;
         desfaseMinutos = 0;
         
-        // Resetear el gradiente del slider
         const porcentaje = (minutosRedondeados / 1439) * 100;
-        timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) 0% ${porcentaje}%, var(--color-borde) ${porcentaje}% 100%)`;
+        timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) ${porcentaje}%, var(--color-borde) ${porcentaje}%)`;
     }
 
     function inicializarSlider() {
@@ -213,33 +210,25 @@ document.addEventListener('DOMContentLoaded', () => {
         timeSlider.value = minutosRedondeados;
         desfaseMinutos = 0;
         
-        // Inicializar el gradiente del slider
         const porcentaje = (minutosRedondeados / 1439) * 100;
-        timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) 0% ${porcentaje}%, var(--color-borde) ${porcentaje}% 100%)`;
+        timeSlider.style.background = `linear-gradient(90deg, var(--color-primario) ${porcentaje}%, var(--color-borde) ${porcentaje}%)`;
     }
 
     function actualizarHoras() {
         const tiempoBase = new Date(new Date().getTime() + desfaseMinutos * 60 * 1000);
         
-        // Actualizar la información de tiempo
         const opcionesFecha = { weekday: 'long', month: 'long', day: 'numeric' };
         infoTiempoDiv.textContent = `Horas para el ${tiempoBase.toLocaleDateString('es-ES', opcionesFecha)}`;
         
-        // Actualizar solo las horas en las tarjetas existentes
         const tarjetas = document.querySelectorAll('.tarjeta-ciudad');
         tarjetas.forEach(tarjeta => {
             const timezone = tarjeta.dataset.timezone;
-            const ciudad = ciudadesSeleccionadas.find(c => c.timezone === timezone);
+            const ciudad = todasLasCiudades.find(c => c.timezone === timezone);
             
             if (ciudad) {
                 const formateador = new Intl.DateTimeFormat('es-ES', { 
-                    timeZone: ciudad.timezone, 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    day: '2-digit', 
-                    month: 'short', 
-                    weekday: 'short', 
-                    hour12: false 
+                    timeZone: ciudad.timezone, hour: '2-digit', minute: '2-digit', 
+                    day: '2-digit', month: 'short', weekday: 'short', hour12: false 
                 });
                 const parts = formateador.formatToParts(tiempoBase);
                 const data = Object.fromEntries(parts.map(p => [p.type, p.value]));
@@ -247,19 +236,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const horaLocal = parseInt(data.hour, 10);
                 const estado = getEstadoCompatibilidad(horaLocal);
                 
-                // Actualizar solo los elementos de tiempo
                 const fechaDisplay = tarjeta.querySelector('.fecha-display');
                 const horaDisplay = tarjeta.querySelector('.hora-display');
                 const puntoCompatibilidad = tarjeta.querySelector('.punto-compatibilidad');
                 
                 if (fechaDisplay) fechaDisplay.textContent = `${data.weekday}, ${data.day} ${data.month}`;
                 if (horaDisplay) horaDisplay.textContent = `${data.hour}:${data.minute}`;
-                if (puntoCompatibilidad) {
-                    puntoCompatibilidad.className = `punto-compatibilidad ${estado}`;
-                }
+                if (puntoCompatibilidad) puntoCompatibilidad.className = `punto-compatibilidad ${estado}`;
             }
         });
     }
 
+    // --- 4. EJECUCIÓN INICIAL ---
     inicializar();
 });

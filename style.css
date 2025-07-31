@@ -131,6 +131,21 @@ header h1 {
 .sugerencia:hover { background-color: var(--color-fondo); }
 .sugerencia small { color: var(--color-texto-secundario); font-weight: 400; }
 
+.sugerencia-titulo {
+    padding: 12px 16px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-texto-secundario);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.sugerencia-none {
+    padding: 16px;
+    text-align: center;
+    color: var(--color-texto-secundario);
+}
+
 /* --- LISTA DE CIUDADES --- */
 #lista-ciudades {
     display: flex;
