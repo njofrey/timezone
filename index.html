@@ -62,11 +62,12 @@
 
         <section id="control-tiempo">
             <div class="slider-wrapper">
-                <button id="reset-time-btn" title="Volver a la hora actual">Ahora</button>
+                <button id="decrement-time-btn" class="time-adjust-btn" title="Restar 15 minutos">-</button>
                 <input type="range" min="0" max="1439" step="15" class="slider" id="time-slider">
+                <button id="increment-time-btn" class="time-adjust-btn" title="Añadir 15 minutos">+</button>
             </div>
-            <div id="info-tiempo" class="info-tiempo-actual">
-            </div>
+            <div id="info-tiempo" class="info-tiempo-actual"></div>
+            <button id="reset-time-btn" title="Volver a la hora actual">Ahora</button>
         </section>
     </div>
 

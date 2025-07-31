@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeSlider = document.getElementById('time-slider');
     const infoTiempoDiv = document.getElementById('info-tiempo');
     const resetTimeBtn = document.getElementById('reset-time-btn');
+    const decrementTimeBtn = document.getElementById('decrement-time-btn');
+    const incrementTimeBtn = document.getElementById('increment-time-btn');
 
     let todasLasCiudades = [];
     let ciudadesSeleccionadas = [];
@@ -103,7 +105,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         timeSlider.addEventListener('input', () => {
             const valorActual = parseInt(timeSlider.value, 10);
-            const valorRedondeado = Math.round(valorActual / 15) * 15;
+            let valorRedondeado = Math.round(valorActual / 15) * 15;
+
+            // Si el valor redondeado es 1440 (24:00), lo tratamos como 0 (00:00)
+            if (valorRedondeado >= 1440) {
+                valorRedondeado = 0;
+            }
+            
             timeSlider.value = valorRedondeado;
             
             const ahora = new Date();
@@ -120,6 +128,37 @@ document.addEventListener('DOMContentLoaded', () => {
             resetearSlider();
             actualizarHoras();
         });
+
+        decrementTimeBtn.addEventListener('click', () => ajustarTiempo(-15));
+        incrementTimeBtn.addEventListener('click', () => ajustarTiempo(15));
+    }
+
+    function ajustarTiempo(minutos) {
+        let valorActual = parseInt(timeSlider.value, 10);
+        let nuevoValor = valorActual + minutos;
+
+        if (nuevoValor < 0) {
+            nuevoValor = 1425; // El último valor múltiplo de 15 (23:45)
+        } else if (nuevoValor >= 1440) {
+            nuevoValor = 0;
+        }
+        
+        timeSlider.value = nuevoValor;
+        timeSlider.dispatchEvent(new Event('input'));
+    }
+
+    function ajustarTiempo(minutos) {
+        let valorActual = parseInt(timeSlider.value, 10);
+        let nuevoValor = valorActual + minutos;
+
+        if (nuevoValor < 0) {
+            nuevoValor = 1425; // El último valor múltiplo de 15 (23:45)
+        } else if (nuevoValor >= 1440) {
+            nuevoValor = 0;
+        }
+        
+        timeSlider.value = nuevoValor;
+        timeSlider.dispatchEvent(new Event('input'));
     }
 
     function mostrarSugerencias() {

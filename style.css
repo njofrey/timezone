@@ -305,24 +305,51 @@ header h1 {
     color: white;
 }
 
+/* Estilos del control de tiempo mejorados para UX */
 #control-tiempo {
     border-top: 1px solid var(--color-borde);
     padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centramos todo */
+    gap: 12px;
+}
+.slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Aumentamos el espacio */
+    width: 100%;
+}
+.time-adjust-btn {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color-borde);
+    background-color: var(--color-superficie);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--color-texto-principal);
+    cursor: pointer;
+    transition: var(--transicion);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.time-adjust-btn:hover {
+    background-color: #f0f0f0;
+    border-color: var(--color-primario);
+    transform: scale(1.05);
 }
 .info-tiempo-actual {
     text-align: center;
     font-size: 13px;
     color: var(--color-texto-secundario);
-    margin-top: 12px;
-}
-.slider-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    margin: 0; /* Eliminamos margen superior */
 }
 #reset-time-btn {
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 8px 16px; /* Aumentamos padding horizontal */
+    font-size: 14px;
     font-weight: 500;
     border: 1px solid var(--color-borde);
     border-radius: var(--radio-borde);
@@ -331,6 +358,7 @@ header h1 {
     cursor: pointer;
     transition: var(--transicion);
     white-space: nowrap;
+    order: 3; /* Lo movemos al final en el flex container */
 }
 
 #reset-time-btn:hover { 
@@ -344,32 +372,39 @@ header h1 {
 .slider {
     -webkit-appearance: none;
     width: 100%;
-    height: 8px;
+    height: 12px; /* Más grueso para mejor toque */
     background: linear-gradient(90deg, var(--color-primario) 0%, var(--color-borde) 0%);
-    border-radius: 4px;
+    border-radius: 6px;
     outline: none;
-    transition: var(--transicion);
+    transition: background 0.3s ease;
     cursor: pointer;
 }
 .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
-    background: var(--color-primario);
+    width: 24px; /* Más grande */
+    height: 24px; /* Más grande */
+    background: var(--color-superficie);
     border-radius: 50%;
     cursor: pointer;
-    border: 3px solid var(--color-superficie);
+    border: 2px solid var(--color-primario);
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s ease;
+}
+.slider::-webkit-slider-thumb:active {
+    transform: scale(1.2); /* Feedback visual al arrastrar */
 }
 .slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: var(--color-primario);
+    width: 24px; /* Más grande */
+    height: 24px; /* Más grande */
+    background: var(--color-superficie);
     border-radius: 50%;
     cursor: pointer;
-    border: 3px solid var(--color-superficie);
+    border: 2px solid var(--color-primario);
     box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+.slider::-moz-range-thumb:active {
+    transform: scale(1.2);
 }
 
 /* --- RESPONSIVE DESIGN --- */
@@ -396,18 +431,22 @@ header h1 {
     }
     
     .info-hora {
+        /* Reestructuramos a grid para dar más espacio a la hora */
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-areas:
+            "fecha punto"
+            "hora hora";
+        gap: 4px;
+        align-items: center;
         text-align: right;
-        /* Prevenir que el contenido de la hora cause overflow */
-        min-width: 0;
-        flex-shrink: 0;
     }
-
-    .hora-display {
-        font-size: 28px;
-        /* Asegurar que el texto de la hora no cause overflow */
-        word-break: keep-all;
-        overflow: hidden;
-        text-overflow: ellipsis;
+    .punto-compatibilidad { grid-area: punto; }
+    .fecha-display { grid-area: fecha; }
+    .hora-display { 
+        grid-area: hora;
+        font-size: 32px; /* La hacemos grande y legible */
+        line-height: 1.1;
     }
     
     /* Prevenir overflow en elementos de texto */
